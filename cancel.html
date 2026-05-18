@@ -355,6 +355,24 @@
 
     .success-note strong { color: var(--navy); }
 
+    /* ── Re-book button ─────────────────────────────────────────────────── */
+
+    .rebook-btn {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 13px 24px;
+      border-radius: var(--radius);
+      background: var(--navy);
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .rebook-btn:active { opacity: 0.75; }
+
     /* ── Partial — remaining dates after partial cancel ─────────────────── */
 
     .partial-remaining {
@@ -397,8 +415,9 @@
         <div class="error-msg"  id="errorMsg"></div>
       </div>
       <div class="contact-note">
-        ¿Necesita ayuda? Comuníquese con Ave al<br>
-        <strong>(919) 538-0776</strong>
+        ¿Necesita ayuda? Comuníquese con <strong id="coordinatorNameError"></strong><br>
+        o reserve una nueva fecha:<br>
+        <a class="rebook-btn" id="rebookBtnError" href="#">Reservar nueva fecha →</a>
       </div>
     </div>
 
@@ -440,8 +459,9 @@
         <div class="partial-remaining" id="partialRemaining" style="display:none"></div>
         <div class="success-note">
           ¿Canceló por error o necesita reagendar?<br>
-          Puede reservar nuevamente en el enlace principal o<br>
-          comuníquese con Ave al <strong>(919) 538-0776</strong>.
+          Comuníquese con <strong id="coordinatorNameSuccess"></strong><br>
+          o reserve una nueva fecha:<br><br>
+          <a class="rebook-btn" id="rebookBtnSuccess" href="#">Reservar nueva fecha →</a>
         </div>
       </div>
     </div>
@@ -450,7 +470,9 @@
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
+const API_URL       = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
+const BOOKING_URL   = 'https://avellenemaria.github.io/comidas-rama-garner-2/';
+const COORDINATOR   = 'Hermana Campos';
 
 // Group colors — matches index.html
 const GROUP_COLORS = {
@@ -467,6 +489,14 @@ let selected = new Set(); // eventIds selected for cancel
 // ── Init ─────────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', function() {
+  // Wire coordinator name and rebook links
+  document.querySelectorAll('[id^="coordinatorName"]').forEach(function(el) {
+    el.textContent = COORDINATOR;
+  });
+  document.querySelectorAll('[id^="rebookBtn"]').forEach(function(el) {
+    el.href = BOOKING_URL;
+  });
+
   const params = new URLSearchParams(window.location.search);
   const token  = params.get('token') || '';
 

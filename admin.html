@@ -218,10 +218,13 @@
   <!-- Screen 3: Missionary sets -->
   <div class="screen" id="s3">
     <div class="screen-title">Misioneros activos</div>
-    <div class="screen-sub">Agregue un grupo por cada companía de misioneros. Indique si son Élderes o Hermanas, su zona, y si tienen alguna restricción alimentaria.</div>
+    <div class="screen-sub">Cada bloque representa una companía activa. Si solo tienen Élderes, llene un bloque. Si tienen Élderes y Hermanas, llene dos bloques. Si tienen dos companías de Élderes, agregue dos bloques de Élderes.</div>
+    <div class="info-box" style="margin-bottom:16px">
+      💡 Solo agregue los misioneros que están sirviendo <strong>ahora mismo</strong>. En cada transferencia, actualice estos bloques con los nuevos misioneros.
+    </div>
     <div class="error-box" id="setsError"></div>
     <div id="setsList"></div>
-    <button class="add-set-btn" onclick="addSet()">+ Agregar companía</button>
+    <button class="add-set-btn" onclick="addSet()">+ Agregar otra companía</button>
     <button class="primary-btn" style="margin-top:16px" onclick="validateSetsAndContinue()">Continuar</button>
   </div>
 

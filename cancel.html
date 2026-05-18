@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<!-- Comidas Garner 2 — cancel.html -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a2a4a">
+  <title>Cancelar Comida — Rama Garner 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --navy:   #1a2a4a;
+      --gold:   #c8a96e;
+      --light:  #f4f6fa;
+      --white:  #ffffff;
+      --gray:   #888;
+      --red:    #c0392b;
+      --red-bg: #fdf0f0;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(26,42,74,0.13);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--light);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--white);
+      box-shadow: 0 0 40px rgba(0,0,0,0.08);
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+
+    .header {
+      background: var(--navy);
+      padding: 20px 20px 18px;
+    }
+
+    .header-branch {
+      color: rgba(200,169,110,0.7);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header-title {
+      color: var(--white);
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    /* ── Main content ───────────────────────────────────────────────────── */
+
+    .content {
+      padding: 24px 16px 48px;
+    }
+
+    /* ── States ─────────────────────────────────────────────────────────── */
+
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* Loading */
+    .loading-wrap {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(26,42,74,0.15);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    /* Error */
+    .error-card {
+      background: var(--red-bg);
+      border: 1px solid #f0c0c0;
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .error-icon  { font-size: 40px; margin-bottom: 12px; display: block; }
+    .error-title { font-size: 17px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    .error-msg   { font-size: 14px; color: #7a2a2a; line-height: 1.6; }
+
+    .contact-note {
+      margin-top: 20px;
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .contact-note strong { color: var(--navy); }
+
+    /* Booking info */
+    .booking-card {
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .booking-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+
+    .booking-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .booking-row:last-child { border-bottom: none; }
+    .booking-key { opacity: 0.7; font-weight: 500; }
+    .booking-val { font-weight: 700; text-align: right; max-width: 60%; }
+
+    /* Date selection */
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .date-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .date-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      border: 2px solid #dde4f0;
+      background: var(--white);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .date-item.checked {
+      border-color: var(--red);
+      background: var(--red-bg);
+    }
+
+    .date-item.checked .date-check { background: var(--red); border-color: var(--red); }
+    .date-item.checked .date-check::after { opacity: 1; }
+
+    .date-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #dde4f0;
+      background: var(--light);
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .date-check::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .date-info { flex: 1; min-width: 0; }
+
+    .date-display {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .date-time {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    /* Select all / none */
+    .sel-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .sel-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid #dde4f0;
+      background: var(--light);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .sel-btn:active { background: #dde4f0; }
+
+    /* Warning box */
+    .warning-box {
+      background: #fff8e8;
+      border: 1px solid #e8d5a0;
+      border-radius: var(--radius);
+      padding: 13px 15px;
+      font-size: 13px;
+      color: #7a5a10;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .warning-box.visible { display: block; }
+
+    /* Submit */
+    .cancel-btn {
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--red);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+
+    .cancel-btn:active   { transform: scale(0.98); }
+    .cancel-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-spinner {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 7px;
+    }
+
+    /* Error inline */
+    .inline-error {
+      background: var(--red-bg);
+      border: 1px solid #f0c0c0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .inline-error.visible { display: block; }
+
+    /* ── Success ─────────────────────────────────────────────────────────── */
+
+    .success-wrap { text-align: center; padding: 16px 0; }
+    .success-icon { font-size: 56px; margin-bottom: 14px; display: block; }
+
+    .success-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .success-msg {
+      font-size: 15px;
+      color: var(--gray);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .success-note {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.7;
+      text-align: left;
+    }
+
+    .success-note strong { color: var(--navy); }
+
+    /* ── Partial — remaining dates after partial cancel ─────────────────── */
+
+    .partial-remaining {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--navy);
+      line-height: 1.6;
+    }
+
+    .partial-remaining strong { display: block; margin-bottom: 6px; font-size: 14px; }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-branch">Rama Garner 2</div>
+    <div class="header-title">Cancelar Comida</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Loading state -->
+    <div class="state active" id="stateLoading">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-title">Buscando su reservación...</div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="state" id="stateError">
+      <div class="error-card">
+        <span class="error-icon">⚠️</span>
+        <div class="error-title" id="errorTitle">Enlace no válido</div>
+        <div class="error-msg"  id="errorMsg"></div>
+      </div>
+      <div class="contact-note">
+        ¿Necesita ayuda? Comuníquese con Ave al<br>
+        <strong>(919) 538-0776</strong>
+      </div>
+    </div>
+
+    <!-- Cancel form state -->
+    <div class="state" id="stateForm">
+
+      <!-- Booking summary card -->
+      <div class="booking-card" id="bookingCard">
+        <div class="booking-card-label" id="bookingCardLabel">Reservación</div>
+        <div id="bookingRows"></div>
+      </div>
+
+      <div class="section-title">¿Qué fechas desea cancelar?</div>
+      <div class="section-sub" id="sectionSub">Seleccione las fechas que necesita cancelar.</div>
+
+      <div class="sel-row">
+        <button class="sel-btn" onclick="selectAll()">Seleccionar todo</button>
+        <button class="sel-btn" onclick="selectNone()">Quitar selección</button>
+      </div>
+
+      <div class="date-list" id="dateList"></div>
+
+      <div class="warning-box" id="warningBox"></div>
+
+      <button class="cancel-btn" id="cancelBtn" onclick="submitCancel()" disabled>
+        Cancelar fechas seleccionadas
+      </button>
+
+      <div class="inline-error" id="inlineError"></div>
+
+    </div>
+
+    <!-- Success state -->
+    <div class="state" id="stateSuccess">
+      <div class="success-wrap">
+        <span class="success-icon" id="successIcon">✅</span>
+        <div class="success-title" id="successTitle">Cancelación confirmada</div>
+        <div class="success-msg"   id="successMsg"></div>
+        <div class="partial-remaining" id="partialRemaining" style="display:none"></div>
+        <div class="success-note">
+          ¿Canceló por error o necesita reagendar?<br>
+          Puede reservar nuevamente en el enlace principal o<br>
+          comuníquese con Ave al <strong>(919) 538-0776</strong>.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
+
+// Group colors — matches index.html
+const GROUP_COLORS = {
+  todos_misioneros: { bg: '#134f5c', fg: '#a8dde5' },
+  todos_elderes:    { bg: '#2e5f8a', fg: '#e8d5a0' },
+  elderes_garner:   { bg: '#2e5f8a', fg: '#e8d5a0' },
+  elderes:          { bg: '#2e5f8a', fg: '#e8d5a0' },
+  hermanas:         { bg: '#6d2b4e', fg: '#e8b4cc' },
+};
+
+let booking  = null;   // full booking object from API
+let selected = new Set(); // eventIds selected for cancel
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', function() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token') || '';
+
+  if (!token) {
+    showError('Enlace no válido', 'Este enlace no contiene un código de reservación. Verifique el correo electrónico de confirmación.');
+    return;
+  }
+
+  loadBooking(token);
+});
+
+async function loadBooking(token) {
+  try {
+    const url = API_URL + '?action=booking&token=' + encodeURIComponent(token) + '&t=' + Date.now();
+    const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (!data.success) {
+      showError('No se pudo cargar la reservación', data.error || 'Enlace no válido o expirado.');
+      return;
+    }
+
+    booking = data.booking;
+    renderForm();
+
+  } catch (err) {
+    showError(
+      'Error de conexión',
+      'No se pudo cargar la reservación. Verifique su conexión e intente de nuevo.'
+    );
+  }
+}
+
+// ── Render form ──────────────────────────────────────────────────────────────
+
+function renderForm() {
+  const colors = GROUP_COLORS[booking.groupId] || { bg: '#1a2a4a', fg: '#c8a96e' };
+
+  // Booking summary card
+  const card = document.getElementById('bookingCard');
+  card.style.background = colors.bg;
+  card.style.color      = colors.fg;
+
+  document.getElementById('bookingCardLabel').textContent = booking.groupLabel;
+
+  const rows = [
+    { key: 'Familia', val: 'Familia ' + booking.familyName },
+    { key: 'Hora',    val: booking.time },
+    { key: 'Estado',  val: booking.status === 'partial' ? 'Parcialmente cancelada' : 'Activa' },
+  ];
+
+  document.getElementById('bookingRows').innerHTML = rows.map(function(r) {
+    return '<div class="booking-row">' +
+           '<span class="booking-key">' + r.key + '</span>' +
+           '<span class="booking-val">' + r.val + '</span>' +
+           '</div>';
+  }).join('');
+
+  // Subtitle
+  const sub = document.getElementById('sectionSub');
+  if (booking.events.length === 1) {
+    sub.textContent = 'Solo tiene una fecha reservada.';
+  } else {
+    sub.textContent = 'Tiene ' + booking.events.length + ' fechas reservadas. Seleccione las que necesita cancelar.';
+  }
+
+  // Date checkboxes
+  const list = document.getElementById('dateList');
+  list.innerHTML = '';
+
+  booking.events.forEach(function(ev) {
+    const item = document.createElement('div');
+    item.className   = 'date-item';
+    item.dataset.eid = ev.eventId;
+    item.innerHTML   = '<div class="date-check"></div>' +
+                       '<div class="date-info">' +
+                       '<div class="date-display">' + ev.dateDisplay + '</div>' +
+                       '<div class="date-time">' + booking.time + '</div>' +
+                       '</div>';
+    item.addEventListener('click', function() { toggleDate(ev.eventId, item); });
+    list.appendChild(item);
+  });
+
+  // If only one date, pre-select it
+  if (booking.events.length === 1) {
+    const onlyItem = list.querySelector('.date-item');
+    if (onlyItem) toggleDate(booking.events[0].eventId, onlyItem);
+  }
+
+  showState('stateForm');
+}
+
+// ── Date selection ───────────────────────────────────────────────────────────
+
+function toggleDate(eventId, item) {
+  if (selected.has(eventId)) {
+    selected.delete(eventId);
+    item.classList.remove('checked');
+  } else {
+    selected.add(eventId);
+    item.classList.add('checked');
+  }
+  updateCancelButton();
+}
+
+function selectAll() {
+  document.querySelectorAll('.date-item').forEach(function(item) {
+    selected.add(item.dataset.eid);
+    item.classList.add('checked');
+  });
+  updateCancelButton();
+}
+
+function selectNone() {
+  selected.clear();
+  document.querySelectorAll('.date-item').forEach(function(item) {
+    item.classList.remove('checked');
+  });
+  updateCancelButton();
+}
+
+function updateCancelButton() {
+  const btn     = document.getElementById('cancelBtn');
+  const warning = document.getElementById('warningBox');
+  const count   = selected.size;
+
+  btn.disabled = count === 0;
+
+  if (count === 0) {
+    btn.textContent = 'Cancelar fechas seleccionadas';
+    warning.classList.remove('visible');
+    return;
+  }
+
+  const isAll = count === booking.events.length;
+
+  btn.textContent = isAll
+    ? 'Cancelar toda la reservación (' + count + ' fecha' + (count > 1 ? 's' : '') + ')'
+    : 'Cancelar ' + count + ' fecha' + (count > 1 ? 's' : '') + ' seleccionada' + (count > 1 ? 's' : '');
+
+  if (isAll && booking.events.length > 1) {
+    warning.textContent = '⚠️ Va a cancelar TODAS sus fechas. Esta acción no se puede deshacer.';
+    warning.classList.add('visible');
+  } else {
+    warning.classList.remove('visible');
+  }
+}
+
+// ── Submit cancel ────────────────────────────────────────────────────────────
+
+async function submitCancel() {
+  if (selected.size === 0) return;
+
+  const btn   = document.getElementById('cancelBtn');
+  const error = document.getElementById('inlineError');
+
+  error.classList.remove('visible');
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="btn-spinner"></span>Cancelando...';
+
+  const payload = {
+    action:   'cancel',
+    token:    booking.token,
+    eventIds: Array.from(selected),
+  };
+
+  try {
+    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+
+    if (data.success) {
+      showSuccess(data);
+      return;
+    }
+
+    // Show inline error, re-enable button
+    error.textContent = data.error || 'Hubo un error. Por favor intente de nuevo.';
+    error.classList.add('visible');
+    btn.disabled  = false;
+    btn.innerHTML = 'Cancelar fechas seleccionadas';
+
+  } catch (err) {
+    error.textContent = 'Error de conexión. Verifique su internet e intente de nuevo.';
+    error.classList.add('visible');
+    btn.disabled  = false;
+    btn.innerHTML = 'Cancelar fechas seleccionadas';
+  }
+}
+
+// ── Show success ─────────────────────────────────────────────────────────────
+
+function showSuccess(data) {
+  const isAll  = data.status === 'cancelled';
+  const count  = data.cancelled;
+
+  document.getElementById('successIcon').textContent  = isAll ? '✅' : '✅';
+  document.getElementById('successTitle').textContent = isAll ? 'Reservación cancelada' : 'Fechas canceladas';
+  document.getElementById('successMsg').textContent   =
+    count === 1
+      ? 'Su fecha ha sido cancelada. Ese día ya estará disponible para otras familias.'
+      : count + ' fechas han sido canceladas. Esos días ya estarán disponibles para otras familias.';
+
+  const partialEl = document.getElementById('partialRemaining');
+  if (!isAll && data.remaining > 0) {
+    partialEl.style.display = 'block';
+    partialEl.innerHTML     =
+      '<strong>Fechas que quedan activas:</strong>' +
+      'Todavía tiene ' + data.remaining + ' fecha' + (data.remaining > 1 ? 's' : '') +
+      ' reservada' + (data.remaining > 1 ? 's' : '') + '. ' +
+      'Los misioneros les llamarán para confirmar antes de cada comida.';
+  } else {
+    partialEl.style.display = 'none';
+  }
+
+  showState('stateSuccess');
+}
+
+// ── State helpers ────────────────────────────────────────────────────────────
+
+function showState(stateId) {
+  document.querySelectorAll('.state').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  document.getElementById(stateId).classList.add('active');
+}
+
+function showError(title, msg) {
+  document.getElementById('errorTitle').textContent = title;
+  document.getElementById('errorMsg').textContent   = msg;
+  showState('stateError');
+}
+</script>
+</body>
+</html>

@@ -404,8 +404,6 @@
       flex-shrink: 0;
     }
 
-    /* ── Availability nudge ────────────────────────────────────────────────── */
-
     .avail-nudge-wrap         { display: none; margin-bottom: 12px; }
     .avail-nudge-wrap.visible { display: block; }
 
@@ -537,8 +535,6 @@
 
     .avail-book-btn:active { opacity: 0.75; }
 
-    /* ── Time screen ───────────────────────────────────────────────────────── */
-
     .date-banner {
       background: var(--light);
       border-radius: var(--radius);
@@ -588,10 +584,6 @@
 
     .time-btn.taken::after { content: ' — Reservado'; font-size: 12px; }
 
-    /* ── Same-day call card ────────────────────────────────────────────────── */
-    /* Replaces a time slot that is within 1 hour or already passed today.     */
-    /* Informational only — no booking button.                                 */
-
     .time-call-card {
       width: 100%;
       padding: 13px 15px;
@@ -604,12 +596,7 @@
       text-align: left;
     }
 
-    .time-call-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
+    .time-call-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
     .time-call-info { flex: 1; min-width: 0; }
 
     .time-call-slot {
@@ -619,13 +606,7 @@
       margin-bottom: 3px;
     }
 
-    .time-call-msg {
-      font-size: 12px;
-      color: #7a6020;
-      line-height: 1.5;
-    }
-
-    /* ── Recurrence screen ─────────────────────────────────────────────────── */
+    .time-call-msg { font-size: 12px; color: #7a6020; line-height: 1.5; }
 
     .recurring-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
 
@@ -663,8 +644,6 @@
     }
 
     .recur-icon { font-size: 20px; }
-
-    /* ── Booking summary & form ────────────────────────────────────────────── */
 
     .booking-summary {
       border-radius: var(--radius);
@@ -756,10 +735,6 @@
 
     .error-box.visible { display: block; }
 
-    /* ── Racing family conflict notice ─────────────────────────────────────── */
-    /* Shown instead of a hard error when a date was just taken by             */
-    /* another family. Friendly, explains what happened, reloads calendar.     */
-
     .conflict-box {
       background: #fff8e8;
       border: 1px solid #e8d5a0;
@@ -774,7 +749,21 @@
 
     .conflict-box.visible { display: block; }
 
-    /* ── Success screen ────────────────────────────────────────────────────── */
+    /* ── Safety screening pills ── */
+    .screening-pill {
+      flex: 1;
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 2px solid #dde4f0;
+      background: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
 
     .success-wrap { text-align: center; padding: 16px 0; }
     .success-icon { font-size: 64px; margin-bottom: 14px; display: block; }
@@ -897,7 +886,6 @@
         <button class="cal-nav-btn" id="nextMonth" onclick="changeMonth(1)">›</button>
       </div>
 
-      <!-- Availability nudge — above grid, visible without scrolling -->
       <div class="avail-nudge-wrap" id="availNudgeWrap">
         <button class="avail-nudge-btn" id="availNudgeBtn" onclick="toggleAvailPanel()">
           Revisando disponibilidad...
@@ -981,6 +969,19 @@
       <label>Correo electrónico <span class="opt">(opcional — para confirmación)</span></label>
       <input type="email" id="fEmail" placeholder="correo@ejemplo.com" autocomplete="email">
     </div>
+
+    <!-- Safety screening question — shown only when coordinator activates it -->
+    <div class="field" id="screeningField" style="display:none">
+      <label>¿Puede recibir a los misioneros? <span class="req">*</span></label>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:10px;line-height:1.5">
+        Los misioneros que sirven actualmente son del sexo opuesto. ¿Puede recibirlos en su hogar, o necesita coordinar un acompañante?
+      </p>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="screening-pill" id="screenYes" onclick="selectScreening('yes')">Sí, no hay problema</button>
+        <button type="button" class="screening-pill" id="screenNo"  onclick="selectScreening('no')">Necesito coordinar</button>
+      </div>
+    </div>
+
     <div class="field">
       <label>Notas <span class="opt">(opcional)</span></label>
       <textarea id="fNotas" placeholder="Instrucciones de entrega, alergias, etc."></textarea>
@@ -1000,8 +1001,7 @@
       <div class="success-card" id="successCard"></div>
       <div class="success-note">
         Los misioneros les llamarán para confirmar antes de cada comida.<br><br>
-        Si necesita cancelar o cambiar su comida, comuníquese con Ave al<br>
-        <strong>(919) 538-0776</strong>
+        Si necesita cancelar, use el enlace en su correo de confirmación.
       </div>
     </div>
   </div>
@@ -1011,8 +1011,8 @@
 <script>
 const GROUPS = [
   { id: 'todos_misioneros', label: 'Todos los Misioneros', desc: 'Todos los misioneros juntos', icon: 'icon-todos.png', bg: '#134f5c', fg: '#a8dde5' },
-  { id: 'elderes_garner', label: 'Élderes', desc: 'Compañía de Élderes', icon: 'icon-elderes.png', bg: '#2e5f8a', fg: '#e8d5a0' },
-  { id: 'hermanas', label: 'Hermanas', desc: 'Compañía de Hermanas', icon: 'icon-hermanas.jpg', bg: '#6d2b4e', fg: '#e8b4cc' }
+  { id: 'elderes_garner',   label: 'Élderes',              desc: 'Compañía de Élderes',         icon: 'icon-elderes.png', bg: '#2e5f8a', fg: '#e8d5a0' },
+  { id: 'hermanas',         label: 'Hermanas',             desc: 'Compañía de Hermanas',         icon: 'icon-hermanas.jpg', bg: '#6d2b4e', fg: '#e8b4cc' }
 ];
 
 const TIME_SLOTS = [
@@ -1021,12 +1021,11 @@ const TIME_SLOTS = [
   '7:00 pm','7:30 pm'
 ];
 
-// Full recurrence options — filtered at runtime based on actual availability.
 const RECUR_OPTIONS_ALL = [
   { weeks: 1, label: 'No, solo esta fecha',  icon: '📅' },
   { weeks: 2, label: '2 semanas seguidas',   icon: '🔁' },
   { weeks: 3, label: '3 semanas seguidas',   icon: '🔁' },
-  { weeks: 4, label: '4 semanas (1 mes)',     icon: '📆' },
+  { weeks: 4, label: '4 semanas (1 mes)',    icon: '📆' },
   { weeks: 5, label: '5 semanas seguidas',   icon: '🔁' },
   { weeks: 6, label: '6 semanas seguidas',   icon: '🔁' },
   { weeks: 7, label: '7 semanas seguidas',   icon: '🔁' },
@@ -1034,6 +1033,10 @@ const RECUR_OPTIONS_ALL = [
 ];
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
+
+// ── Safety screening state ───────────────────────────────────────────────────
+let safetyScreeningEnabled = false;
+let screeningAnswer        = '';   // 'yes', 'no', or ''
 
 let state = {
   step: 1,
@@ -1055,9 +1058,24 @@ const DIAS_ES    = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const DIAS_LONG  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const MESES_LONG = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-window.addEventListener('DOMContentLoaded', () => {
+// ── Init: load settings then build UI ───────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
   buildGroupList();
   updateDots(1);
+
+  // Load safety screening setting — defaults off, never blocks booking flow
+  try {
+    const url  = `${API_URL}?action=settings&t=${Date.now()}`;
+    const res  = await fetch(url, { method: 'GET', cache: 'no-store' });
+    const data = await res.json();
+    if (data && data.success) {
+      safetyScreeningEnabled = !!data.safetyScreeningEnabled;
+      document.getElementById('screeningField').style.display =
+        safetyScreeningEnabled ? 'block' : 'none';
+    }
+  } catch (e) {
+    safetyScreeningEnabled = false;
+  }
 });
 
 function buildGroupList() {
@@ -1094,6 +1112,13 @@ async function selectGroup(g) {
   state.availPanelOpen   = false;
   state.availPanelLoaded = false;
 
+  // Reset screening answer and button styles when a new group is chosen
+  screeningAnswer = '';
+  const yBtn = document.getElementById('screenYes');
+  const nBtn = document.getElementById('screenNo');
+  if (yBtn) { yBtn.style.background = ''; yBtn.style.color = ''; yBtn.style.borderColor = ''; }
+  if (nBtn) { nBtn.style.background = ''; nBtn.style.color = ''; nBtn.style.borderColor = ''; }
+
   document.documentElement.style.setProperty('--group-color', g.bg);
   document.documentElement.style.setProperty('--group-fg',    g.fg);
   document.getElementById('legendAvail').style.background = g.bg;
@@ -1115,6 +1140,24 @@ async function selectGroup(g) {
   renderCalendar();
 }
 
+// ── Safety screening selection ───────────────────────────────────────────────
+function selectScreening(val) {
+  screeningAnswer = val;
+  const yesBtn = document.getElementById('screenYes');
+  const noBtn  = document.getElementById('screenNo');
+  if (!yesBtn || !noBtn) return;
+
+  const bg = state.group ? state.group.bg : 'var(--navy)';
+  const fg = state.group ? state.group.fg : 'var(--gold)';
+
+  yesBtn.style.background  = val === 'yes' ? bg  : '';
+  yesBtn.style.color       = val === 'yes' ? fg  : '';
+  yesBtn.style.borderColor = val === 'yes' ? bg  : '';
+  noBtn.style.background   = val === 'no'  ? bg  : '';
+  noBtn.style.color        = val === 'no'  ? fg  : '';
+  noBtn.style.borderColor  = val === 'no'  ? bg  : '';
+}
+
 function resetAvailPanel() {
   document.getElementById('availNudgeWrap').classList.remove('visible');
   document.getElementById('availPanel').classList.remove('visible');
@@ -1127,10 +1170,10 @@ function resetAvailPanel() {
   state.monthAvailabilityResults = null;
   const nudgeBtn = document.getElementById('availNudgeBtn');
   if (nudgeBtn) {
-    nudgeBtn.disabled = false;
-    nudgeBtn.className = 'avail-nudge-btn';
+    nudgeBtn.disabled    = false;
+    nudgeBtn.className   = 'avail-nudge-btn';
     nudgeBtn.textContent = 'Revisando disponibilidad...';
-    nudgeBtn.onclick = function() { toggleAvailPanel(); };
+    nudgeBtn.onclick     = function() { toggleAvailPanel(); };
   }
 }
 
@@ -1163,7 +1206,7 @@ function showCalendarContent() {
 async function loadBooked() {
   if (!API_URL || API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return false;
   try {
-    const url = `${API_URL}?action=booked&group=${encodeURIComponent(state.group.id)}&t=${Date.now()}`;
+    const url  = `${API_URL}?action=booked&group=${encodeURIComponent(state.group.id)}&t=${Date.now()}`;
     const res  = await fetch(url, { method: 'GET', cache: 'no-store' });
     if (!res.ok) return false;
     const data = await res.json();
@@ -1178,10 +1221,8 @@ async function loadBooked() {
   }
 }
 
-
 function getNextMonthLabel() {
-  const nextMonth = (state.calMonth + 1) % 12;
-  return MESES_LONG[nextMonth];
+  return MESES_LONG[(state.calMonth + 1) % 12];
 }
 
 async function evaluateFullMonthAvailability() {
@@ -1195,8 +1236,8 @@ async function evaluateFullMonthAvailability() {
   state.availPanelLoaded = false;
 
   if (nudgeBtn) {
-    nudgeBtn.disabled = true;
-    nudgeBtn.className = 'avail-nudge-btn';
+    nudgeBtn.disabled    = true;
+    nudgeBtn.className   = 'avail-nudge-btn';
     nudgeBtn.textContent = 'Revisando si otros misioneros necesitan comida este mes...';
   }
 
@@ -1212,9 +1253,7 @@ async function evaluateFullMonthAvailability() {
         if (!data || !Array.isArray(data.bookedDates)) return null;
         const nextOpen = findNextOpenDate(new Set(data.bookedDates), state.calYear, state.calMonth);
         return { group: g, nextOpen };
-      } catch (e) {
-        return null;
-      }
+      } catch (e) { return null; }
     })
   );
 
@@ -1222,10 +1261,10 @@ async function evaluateFullMonthAvailability() {
 
   if (open.length === 0) {
     if (nudgeBtn) {
-      nudgeBtn.disabled = false;
-      nudgeBtn.className = 'month-complete-btn';
+      nudgeBtn.disabled    = false;
+      nudgeBtn.className   = 'month-complete-btn';
       nudgeBtn.textContent = `📅 Este mes está completo — ver disponibilidad en ${getNextMonthLabel()}`;
-      nudgeBtn.onclick = function() { changeMonth(1); };
+      nudgeBtn.onclick     = function() { changeMonth(1); };
     }
     state.monthAvailabilityResults = [];
     state.availPanelLoaded = true;
@@ -1233,10 +1272,10 @@ async function evaluateFullMonthAvailability() {
   }
 
   if (nudgeBtn) {
-    nudgeBtn.disabled = false;
-    nudgeBtn.className = 'avail-nudge-btn';
+    nudgeBtn.disabled    = false;
+    nudgeBtn.className   = 'avail-nudge-btn';
     nudgeBtn.textContent = '🍽️ Aún hay misioneros sin comida este mes — ver disponibilidad';
-    nudgeBtn.onclick = function() { toggleAvailPanel(); };
+    nudgeBtn.onclick     = function() { toggleAvailPanel(); };
   }
 
   state.monthAvailabilityResults = open;
@@ -1278,8 +1317,8 @@ function renderCalendar() {
   let availableCount = 0;
 
   for (let d = 1; d <= lastDay.getDate(); d++) {
-    const date     = new Date(state.calYear, state.calMonth, d);
-    const dateStr  = toDateStr(date);
+    const date    = new Date(state.calYear, state.calMonth, d);
+    const dateStr = toDateStr(date);
     const isPast   = date < today;
     const isToday  = date.getTime() === today.getTime();
     const isBooked = state.bookedDates.has(dateStr);
@@ -1323,8 +1362,6 @@ function changeMonth(dir) {
   if (state.calMonth > 11) { state.calMonth = 0;  state.calYear++; }
   renderCalendar();
 }
-
-// ── Availability panel ──────────────────────────────────────────────────────
 
 async function toggleAvailPanel() {
   const panel = document.getElementById('availPanel');
@@ -1408,12 +1445,6 @@ function findNextOpenDate(bookedSet, year, month) {
   return null;
 }
 
-// ── NEW: Count how many consecutive weeks are available from the selected date.
-// Used to filter the recurrence options so families never see options that
-// would fail due to already-booked future dates.
-// Week 1 = selected date (already confirmed open by the fact they tapped it).
-// Weeks 2–8 = selected date + 7, 14, 21… days — checked against bookedDates.
-
 function getMaxAvailableWeeks(selectedDate) {
   let maxWeeks = 1;
   for (let w = 2; w <= 8; w++) {
@@ -1424,9 +1455,6 @@ function getMaxAvailableWeeks(selectedDate) {
   }
   return maxWeeks;
 }
-
-// ── NEW: Parse a time slot string like "5:30 pm" into a Date on the given day.
-// Used to compare slot times against the current time for same-day bookings.
 
 function parseSlotTime(baseDate, slot) {
   const norm    = slot.trim().toLowerCase();
@@ -1441,8 +1469,6 @@ function parseSlotTime(baseDate, slot) {
   return result;
 }
 
-// ── Time slot screen ────────────────────────────────────────────────────────
-
 function selectDate(date, dateStr) {
   state.selDate = { date, dateStr };
   document.getElementById('dateBannerText').textContent = formatDateDisplay(date);
@@ -1450,12 +1476,11 @@ function selectDate(date, dateStr) {
   const booked      = state.bookedSlots[dateStr] || [];
   const grid        = document.getElementById('timeGrid');
   const isToday     = toDateStr(date) === toDateStr(new Date());
-  const oneHourFrom = new Date(Date.now() + 60 * 60 * 1000);  // now + 1 hour
+  const oneHourFrom = new Date(Date.now() + 60 * 60 * 1000);
 
   grid.innerHTML = '';
 
   TIME_SLOTS.forEach(slot => {
-    // Check if this slot is already taken by another booking
     if (booked.includes(slot)) {
       const btn = document.createElement('button');
       btn.textContent = slot;
@@ -1464,11 +1489,9 @@ function selectDate(date, dateStr) {
       return;
     }
 
-    // Same-day: check if this slot is within 1 hour from now (or already past)
     if (isToday) {
       const slotTime = parseSlotTime(date, slot);
       if (slotTime <= oneHourFrom) {
-        // Show a call-directly card instead of a booking button
         const card = document.createElement('div');
         card.className = 'time-call-card';
         card.innerHTML = `
@@ -1486,7 +1509,6 @@ function selectDate(date, dateStr) {
       }
     }
 
-    // Normal available slot
     const btn = document.createElement('button');
     btn.textContent = slot;
     btn.className   = 'time-btn avail';
@@ -1499,15 +1521,11 @@ function selectDate(date, dateStr) {
   goTo(3);
 }
 
-// ── Recurrence screen ───────────────────────────────────────────────────────
-
 function selectTime(slot) {
   state.selTime = slot;
   document.getElementById('recurBannerText').textContent =
     `${formatDateDisplay(state.selDate.date)} — ${slot}`;
 
-  // ── NEW: Filter recurrence options to only show available consecutive weeks.
-  // We already have bookedDates in memory — no API call needed.
   const maxWeeks = getMaxAvailableWeeks(state.selDate.date);
   const options  = RECUR_OPTIONS_ALL.filter(o => o.weeks <= maxWeeks);
 
@@ -1524,7 +1542,6 @@ function selectTime(slot) {
     opts.appendChild(btn);
   });
 
-  // Add a note if options were limited
   if (maxWeeks < 8) {
     const note = document.createElement('div');
     note.style.cssText = 'font-size:12px;color:var(--gray);text-align:center;padding:8px 4px;line-height:1.5;';
@@ -1557,8 +1574,6 @@ function selectRecur(weeks) {
   goTo(5);
 }
 
-// ── Submit booking ──────────────────────────────────────────────────────────
-
 async function submitBooking() {
   const nombre   = document.getElementById('fNombre').value.trim();
   const raw      = document.getElementById('fTelefono').value.trim();
@@ -1568,8 +1583,8 @@ async function submitBooking() {
     : digits.length === 11 && digits[0] === '1'
       ? `(${digits.slice(1,4)}) ${digits.slice(4,7)}-${digits.slice(7)}`
       : raw;
-  const email    = document.getElementById('fEmail').value.trim();
-  const notas    = document.getElementById('fNotas').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const notas = document.getElementById('fNotas').value.trim();
 
   document.getElementById('errorBox').classList.remove('visible');
   document.getElementById('conflictBox').classList.remove('visible');
@@ -1577,18 +1592,25 @@ async function submitBooking() {
   if (!nombre)   { showError('Por favor ingrese el apellido de su familia.'); return; }
   if (!telefono) { showError('Por favor ingrese su número de teléfono.');     return; }
 
+  // Screening validation — only required when active and question is visible
+  if (safetyScreeningEnabled && !screeningAnswer) {
+    showError('Por favor indique si puede recibir a los misioneros.');
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled  = true;
   btn.innerHTML = '<span class="spinner"></span>Enviando...';
 
   const payload = {
-    action: 'book',
-    group: state.group.id,
+    action:     'book',
+    group:      state.group.id,
     groupLabel: state.group.label,
-    date: state.selDate.dateStr,
-    time: state.selTime,
-    weeks: state.selWeeks,
-    nombre, telefono, email, notas
+    date:       state.selDate.dateStr,
+    time:       state.selTime,
+    weeks:      state.selWeeks,
+    nombre, telefono, email, notas,
+    canReceiveOpposite: screeningAnswer   // '' when screening is off
   };
 
   try {
@@ -1605,10 +1627,6 @@ async function submitBooking() {
       return;
     }
 
-    // ── NEW: Racing families — date conflict handling ─────────────────────
-    // If the error indicates the date is no longer available, another family
-    // just booked it. Show a friendly explanation, reload the calendar in the
-    // background, and return them to the calendar screen automatically.
     const isConflict = result.error &&
       (result.error.includes('no está disponible') ||
        result.error.includes('ya no está disponible'));
@@ -1621,19 +1639,16 @@ async function submitBooking() {
       conflictBox.textContent = '⚠️ Otra familia reservó esa fecha justo antes. Recargando el calendario para que vea las fechas disponibles...';
       conflictBox.classList.add('visible');
 
-      // Reload availability and return to calendar after a short pause
       setTimeout(async () => {
         const reloaded = await loadBooked();
         if (reloaded) renderCalendar();
         goTo(2);
-        // Clear the conflict notice after navigating away
         setTimeout(() => { conflictBox.classList.remove('visible'); }, 300);
       }, 1800);
 
       return;
     }
 
-    // Generic error
     showError(result.error || 'Hubo un error. Intente de nuevo.');
     btn.disabled  = false;
     btn.innerHTML = 'Confirmar comida';
@@ -1675,8 +1690,6 @@ function showSuccess(nombre, p) {
   goTo(6);
 }
 
-// ── Navigation ──────────────────────────────────────────────────────────────
-
 function goTo(step) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(`s${step}`).classList.add('active');
@@ -1698,8 +1711,6 @@ function updateDots(step) {
   }
   document.getElementById('stepDots').style.opacity = step === 6 ? '0' : '1';
 }
-
-// ── Utilities ───────────────────────────────────────────────────────────────
 
 function toDateStr(date) {
   return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;

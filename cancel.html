@@ -414,9 +414,8 @@
         <div class="error-title" id="errorTitle">Enlace no válido</div>
         <div class="error-msg"  id="errorMsg"></div>
       </div>
-      <div class="contact-note">
-        ¿Necesita ayuda? Comuníquese con <strong id="coordinatorNameError"></strong><br>
-        o reserve una nueva fecha:<br>
+      <div class="contact-note" style="text-align:center">
+        ¿Necesita ayuda?<br><br>
         <a class="rebook-btn" id="rebookBtnError" href="#">Reservar nueva fecha →</a>
       </div>
     </div>
@@ -457,10 +456,8 @@
         <div class="success-title" id="successTitle">Cancelación confirmada</div>
         <div class="success-msg"   id="successMsg"></div>
         <div class="partial-remaining" id="partialRemaining" style="display:none"></div>
-        <div class="success-note">
-          ¿Canceló por error o necesita reagendar?<br>
-          Comuníquese con <strong id="coordinatorNameSuccess"></strong><br>
-          o reserve una nueva fecha:<br><br>
+        <div class="success-note" style="text-align:center">
+          ¿Canceló por error o necesita reagendar?<br><br>
           <a class="rebook-btn" id="rebookBtnSuccess" href="#">Reservar nueva fecha →</a>
         </div>
       </div>
@@ -489,10 +486,7 @@ let selected = new Set(); // eventIds selected for cancel
 // ── Init ─────────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', function() {
-  // Wire coordinator name and rebook links
-  document.querySelectorAll('[id^="coordinatorName"]').forEach(function(el) {
-    el.textContent = COORDINATOR;
-  });
+  // Wire rebook links
   document.querySelectorAll('[id^="rebookBtn"]').forEach(function(el) {
     el.href = BOOKING_URL;
   });
